@@ -24,17 +24,23 @@ public class FinishPurchaseController {
     @Autowired
     StateBelongsToCountryValidator stateBelongsToCountryValidator;
 
+    @Autowired
+    CouponValidator couponValidator;
+
+    @Autowired
+    CouponRepository couponRepository;
+
     @InitBinder
     public void init(WebDataBinder webDataBinder){
-        webDataBinder.addValidators(stateBelongsToCountryValidator);
+        webDataBinder.addValidators(stateBelongsToCountryValidator, couponValidator);
     }
     
     @PostMapping
     @Transactional
-    public String finish(@Valid @RequestBody FinishPurchaseRequest request) {
+    public String finish(@Valid @RequestBody FinishPurchaseRequest request){
         //se eu coloquei um país que tem estado então estado deve ser preenchido
-        Purchase newPurchase = request.toModel(entityManager);
+        Purchase newPurchase = request.toModel(entityManager, couponRepository);
         entityManager.persist(newPurchase);
-        return newPurchase.toString();
+        return "created";
     }
 }

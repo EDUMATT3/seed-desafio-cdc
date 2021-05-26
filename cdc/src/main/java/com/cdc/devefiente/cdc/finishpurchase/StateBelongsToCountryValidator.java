@@ -13,8 +13,11 @@ import org.springframework.validation.Validator;
 @Component
 public class StateBelongsToCountryValidator implements Validator {
 
-    @PersistenceContext
-    EntityManager entityManager;
+    private EntityManager entityManager;
+
+    public StateBelongsToCountryValidator(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {

@@ -37,12 +37,10 @@ public class Author {
     @Deprecated
     public Author(){}
 
-    //tips
     public Author(@NotBlank String name, @NotBlank @Email String email, 
     @NotBlank @Size(max = 400) String description) {
         this.name = name;
         this.email = email;
         this.description = description;
     } 
-
 }

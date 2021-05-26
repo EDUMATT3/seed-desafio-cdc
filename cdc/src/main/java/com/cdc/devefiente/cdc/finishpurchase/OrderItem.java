@@ -10,6 +10,9 @@ import javax.validation.constraints.Positive;
 
 import com.cdc.devefiente.cdc.book.Book;
 
+import lombok.ToString;
+
+@ToString
 @Embeddable
 public class OrderItem {
 

@@ -16,6 +16,7 @@ import com.cdc.devefiente.cdc.common.ExistsId;
 import com.cdc.devefiente.cdc.common.UniqueValue;
 import com.cdc.devefiente.cdc.newAuthor.Author;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import org.springframework.util.Assert;
 
@@ -48,8 +49,9 @@ public class NewBookRequest {
     @UniqueValue(domainClass = Book.class, fieldName = "isbn")
     private String isbn;
 
+    @NotNull
     @Future
-    @JsonFormat(pattern="dd-MM-yyyy")
+    @JsonFormat(pattern="dd/MM/yyyy", shape = Shape.STRING)
     private LocalDate publicationDate;
 
     @NotNull 
@@ -81,4 +83,7 @@ public class NewBookRequest {
             .build();
     }
 
+    public void setPublicationDate(LocalDate publicationDate){
+        this.publicationDate = publicationDate;
+    }
 }

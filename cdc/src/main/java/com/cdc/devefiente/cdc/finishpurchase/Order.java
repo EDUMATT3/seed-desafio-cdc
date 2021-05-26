@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -22,6 +23,7 @@ import lombok.NonNull;
 
 @Getter
 @Entity
+@Table(name = "tb_order")
 public class Order {
 
     @Id
@@ -45,13 +47,5 @@ public class Order {
                 (actual, next) -> actual.add(next)
             );   
         return orderTotal.doubleValue() == total.doubleValue();
-    }
-
-    @Override
-    public String toString() {
-        return "{" +
-            " purchase='" + getPurchase() + "'" +
-            ", items='" + getItems() + "'" +
-            "}";
     }
 }

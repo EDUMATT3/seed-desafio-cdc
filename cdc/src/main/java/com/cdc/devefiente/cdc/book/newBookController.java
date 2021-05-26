@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/books")
 @Validated
-public class newBookController {
+public class NewBookController{
 
     @PersistenceContext
     EntityManager entityManager;

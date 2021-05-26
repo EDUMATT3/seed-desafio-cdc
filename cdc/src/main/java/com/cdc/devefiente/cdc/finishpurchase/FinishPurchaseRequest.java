@@ -1,5 +1,6 @@
 package com.cdc.devefiente.cdc.finishpurchase;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.persistence.EntityManager;
@@ -9,12 +10,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.cdc.devefiente.cdc.common.ExistsId;
+import com.cdc.devefiente.cdc.newCoupon.Coupon;
 import com.cdc.devefiente.cdc.newPais.Country;
 import com.cdc.devefiente.cdc.newState.State;
 
-import lombok.Getter;
-
-@Getter
+import org.springframework.util.StringUtils;
 public class FinishPurchaseRequest {
 
     @Email
@@ -46,9 +46,12 @@ public class FinishPurchaseRequest {
     @NotNull
     private NewOrderRequest order;
 
+    @ExistsId(domainClass = Coupon.class,fieldName = "code")
+    private String couponCode;
+
     public FinishPurchaseRequest(@Email @NotBlank String email, @NotBlank String name, @NotBlank String lastName,
             @NotBlank @Document String document, @NotBlank String address, @NotBlank String complement,
-            @NotBlank String city, @NotNull Long countryId, @NotNull Long stateId, @NotBlank String phoneNumber,
+            @NotBlank String city, @NotNull Long countryId, @NotBlank String phoneNumber,
             @NotBlank String cep, @Valid @NotNull NewOrderRequest order) {
         this.email = email;
         this.name = name;
@@ -58,17 +61,25 @@ public class FinishPurchaseRequest {
         this.complement = complement;
         this.city = city;
         this.countryId = countryId;
-        this.stateId = stateId;
         this.phoneNumber = phoneNumber;
         this.cep = cep;
         this.order = order;
+    }
+
+    //não esta no construtor pois não é obrigatório
+    public void setStateId(Long stateId){
+        this.stateId = stateId;
+    }
+
+    public void setCouponCode(String couponCode){
+        this.couponCode = couponCode;
     }
 
     public NewOrderRequest getOrder(){
         return order;
     }
 
-    public Purchase toModel(EntityManager entityManager) {
+    public Purchase toModel(EntityManager entityManager, CouponRepository couponRepository) {
 
         @NotNull Country country = entityManager.find(Country.class, countryId);
         
@@ -80,28 +91,27 @@ public class FinishPurchaseRequest {
             purchase.setState(entityManager.find(State.class, stateId));
         }
 
+        if(StringUtils.hasText(couponCode)){
+            Coupon coupon = couponRepository.getByCode(couponCode);
+            purchase.applyCoupon(coupon);
+        }
+
         return purchase;
     }  
 
-    @Override
-    public String toString() {
-        return "{" +
-            " email='" + getEmail() + "'" +
-            ", name='" + getName() + "'" +
-            ", lastName='" + getLastName() + "'" +
-            ", document='" + getDocument() + "'" +
-            ", address='" + getAddress() + "'" +
-            ", complement='" + getComplement() + "'" +
-            ", city='" + getCity() + "'" +
-            ", countryId='" + getCountryId() + "'" +
-            ", stateId='" + getStateId() + "'" +
-            ", phoneNumber='" + getPhoneNumber() + "'" +
-            ", cep='" + getCep() + "'" +
-            ", order='" + getOrder() + "'" +
-            "}";
+    public boolean hasState() {
+        return Optional.ofNullable(stateId).isPresent();
     }
 
-    public boolean hasState() {
-        return stateId!=null;
+    public Long getCountryId() {
+        return countryId;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public Optional<String> getCouponCode() {
+        return Optional.ofNullable(couponCode);
     }  
 }

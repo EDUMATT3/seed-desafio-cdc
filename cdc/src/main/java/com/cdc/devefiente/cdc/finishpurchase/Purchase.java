@@ -3,6 +3,7 @@ package com.cdc.devefiente.cdc.finishpurchase;
 import java.util.function.Function;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,14 +15,15 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.cdc.devefiente.cdc.newCoupon.Coupon;
 import com.cdc.devefiente.cdc.newPais.Country;
 import com.cdc.devefiente.cdc.newState.State;
 
 import org.springframework.util.Assert;
 
-import lombok.Getter;
+import lombok.ToString;
 
-@Getter
+@ToString
 @Entity
 public class Purchase {
 
@@ -44,6 +46,9 @@ public class Purchase {
     @OneToOne(mappedBy = "purchase", cascade = CascadeType.PERSIST)
     private Order order;
 
+    @Embedded
+    private AppliedCoupon appliedCoupon;
+
     public Purchase(@Email @NotBlank String email, @NotBlank String name, @NotBlank String lastName,
             @NotBlank @Document String document, @NotBlank String address, @NotBlank String complement,
             @NotNull Country country, @NotBlank String phoneNumber, @NotBlank String cep, Function<Purchase, Order> orderCreatFunction) {
@@ -65,21 +70,9 @@ public class Purchase {
         this.state = state;
     }
 
-
-    @Override
-    public String toString() {
-        return "{" +
-            " email='" + getEmail() + "'" +
-            ", name='" + getName() + "'" +
-            ", lastName='" + getLastName() + "'" +
-            ", document='" + getDocument() + "'" +
-            ", address='" + getAddress() + "'" +
-            ", complement='" + getComplement() + "'" +
-            ", country='" + getCountry() + "'" +
-            ", state='" + getState() + "'" +
-            ", phoneNumber='" + getPhoneNumber() + "'" +
-            ", cep='" + getCep() + "'" +
-            ", order='" + getOrder() + "'" +
-            "}";
+    public void applyCoupon(Coupon coupon) {
+        Assert.isTrue(coupon.isValid(), "The coupon to be applied is not valid");
+        Assert.isNull(appliedCoupon, "You cannot change a purchase coupon");
+        this.appliedCoupon = new AppliedCoupon(coupon);
     }
 }
